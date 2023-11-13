@@ -26,17 +26,17 @@ class GetData(QObject):
         self.width = img.width()
         self.height = img.height()
 
-        inf_path = f"{self.base}/img_inf.txt"
-        cap_path = f"{self.base}/img_cap.txt"
+        inf_path = f"{self.base}/inf_cls.txt"
+        cap_path = f"{self.base}/inf_cap.txt"
 
         bboxes = self.get_label_list(inf_path)
         img = self.draw_boxes(img, bboxes)
         self.send_img.emit(img)
         p, v = self.get_target_num_of_cls(bboxes)
-        self.send_nums(p, v)
+        self.send_nums.emit(p, v)
         with open(cap_path, 'r') as f:
             cap = f.readline()
-        self.send_txts(cap)
+        self.send_txts.emit(cap)
         
 
     def get_label_list(self, file):
@@ -78,7 +78,7 @@ class GetData(QObject):
     def draw_boxes(self, img, bboxes):
         if len(bboxes) > 0:
             painter = QPainter(img)
-            f = QFont("Helvetica [Cronyx]", img.height() / 30)
+            f = QFont("Helvetica [Cronyx]", img.height() / 50)
             for bbox in bboxes:
                 pen = self.get_bbox_pen(int(bbox['cls']))
                 painter.setPen(pen)
