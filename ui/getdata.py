@@ -24,21 +24,22 @@ class GetData(QObject):
 
     def get(self):
         data_path = f"{self.base}/img.jpg"
-        img = QImage(data_path)
-        self.width = img.width()
-        self.height = img.height()
+        qimg = QImage(data_path)
+        self.width = qimg.width()
+        self.height = qimg.height()
 
         inf_path = f"{self.base}/inf_cls.txt"
         cap_path = f"{self.base}/inf_cap.txt"
 
         bboxes = self.get_label_list(inf_path)
-        img = self.draw_boxes(img, bboxes)
-        self.send_img.emit(img)
-        tr = self.get_tr_img(img, bboxes)
+        tr = self.get_tr_img(qimg, bboxes)
         if tr != None:
-            self.send_tr_type(tr[0])
-            self.send_tr_img(tr[1])
-    
+            self.send_tr_type.emit(tr[0])
+            self.send_tr_img.emit(tr[1])
+
+        img = self.draw_boxes(qimg, bboxes)
+        self.send_img.emit(img)
+
         p, v = self.get_target_num_of_cls(bboxes)
         self.send_nums.emit(p, v)
         with open(cap_path, 'r') as f:
@@ -85,12 +86,11 @@ class GetData(QObject):
     def draw_boxes(self, img, bboxes):
         if len(bboxes) > 0:
             painter = QPainter(img)
-            f = QFont("Helvetica [Cronyx]", img.height() / 50)
-            for bbox in bboxes:
+            f = QFont("Helvetica [Cronyx]", img.height() / 30)
+            for i, bbox in enumerate(bboxes):
                 pen = self.get_bbox_pen(int(bbox['cls']))
                 painter.setPen(pen)
-                qrect = QRect(bbox['bbox'][0], bbox['bbox']
-                              [1], bbox['size'][0], bbox['size'][1])
+                qrect = QRect(bbox['bbox'][0], bbox['bbox'][1], bbox['size'][0], bbox['size'][1])
                 painter.drawRect(qrect)
                 painter.setFont(f)
                 class_name = self.class_list[int(bbox['cls'])]
@@ -102,11 +102,12 @@ class GetData(QObject):
     def get_tr_img(self, image, bboxes, tr=[9]):
         best_bbox = {}
         best_conf = 0
-        for bbox in bboxes:
+        for i, bbox in enumerate(bboxes):
             if int(bbox['cls']) in tr:
                 if float(bbox['conf']) >best_conf:
                     best_bbox = bbox
-        if len(best_bbox) >0:
+                    best_conf = float(bbox['conf'])
+        if best_bbox:
             best_rect = QRect(best_bbox['bbox'][0], best_bbox['bbox'][1], best_bbox['size'][0], best_bbox['size'][1])
             tr_img = self.crop_image(image, best_rect)
             tr_type = int(best_bbox['cls'])
@@ -118,7 +119,8 @@ class GetData(QObject):
         cropped_pixmap = QPixmap(crop_rect.size())
         cropped_pixmap.fill(Qt.white)
         painter = QPainter(cropped_pixmap)
-        painter.drawPixmap(QRect(0, 0, crop_rect.width(), crop_rect.height()), image, crop_rect)
+
+        painter.drawPixmap(QRect(0, 0, crop_rect.width(), crop_rect.height()), QPixmap.fromImage(image), crop_rect)
         painter.end()
         return cropped_pixmap
     

@@ -35,21 +35,20 @@ class MainWindow(QMainWindow, form_class):
             QPixmap.fromImage(_object).scaled(self.img.width(), self.img.height(), aspectRatioMode=1))
     
     def disp_tr_img(self, _object):
-        self.tr_img.setPixmap(
-            QPixmap.fromImage(_object).scaled(self.img.width(), self.img.height(), aspectRatioMode=1))
+        self.tr_img.setPixmap(_object.scaled(self.img.width(), self.img.height(), aspectRatioMode=1))
     
     def disp_tr_type(self, t):
-        #TODO fix tr class (10) -> for test
-        tl_cls_list = [[6, 12, 10,13, 15], [8, 11, 13, 16], [12, 14], [4, 9, 14, 17]] #R, Y, Arr, G
+        #TODO fix tr class (9) -> for test
+        tl_cls_list = [[9, 6, 12, 10,13, 15], [8, 11, 13, 16], [12, 14], [4, 14, 17]] #R, Y, Arr, G
         tl_detect_cls = [i for i, cls in enumerate(tl_cls_list) if t in cls]
         
         for tc in tl_detect_cls:
             if tc == 0:
-                self.tr_list[tc].setStyleSheet('background-color: rgb(255, 66, 98)')
+                self.tr_list[tc].setStyleSheet('border:1px solid black;border-radius:25px;background-color: rgb(255, 66, 98);')
             if tc == 1:
-                self.tr_list[tc].setStyleSheet('background-color: rgb(255, 208, 66)')
+                self.tr_list[tc].setStyleSheet('border:1px solid black;border-radius:25px;background-color: rgb(255, 208, 66);')
             if tc == 2 or tc == 3:
-                self.tr_list[tc].setStyleSheet('background-color: rgb(59, 217, 153)')
+                self.tr_list[tc].setStyleSheet('border:1px solid black;border-radius:25px;background-color: rgb(59, 217, 153);')
         
     def disp_num(self, p, v):
         self.p_cnt.setText(str(p))
