@@ -17,6 +17,8 @@ class GetData(QObject):
             self.class_list = [line.strip() for line in f.readlines()]
 
     send_img = pyqtSignal(object)
+    send_tr_img = pyqtSignal(object)
+    send_tr_type = pyqtSignal(int)
     send_nums = pyqtSignal(int, int)
     send_txts = pyqtSignal(str)
 
@@ -32,6 +34,11 @@ class GetData(QObject):
         bboxes = self.get_label_list(inf_path)
         img = self.draw_boxes(img, bboxes)
         self.send_img.emit(img)
+        tr = self.get_tr_img(img, bboxes)
+        if tr != None:
+            self.send_tr_type(tr[0])
+            self.send_tr_img(tr[1])
+    
         p, v = self.get_target_num_of_cls(bboxes)
         self.send_nums.emit(p, v)
         with open(cap_path, 'r') as f:
@@ -91,7 +98,30 @@ class GetData(QObject):
                     bbox['bbox'][0], bbox['bbox'][1] - 10, class_name)
             painter.end()
         return img
+    
+    def get_tr_img(self, image, bboxes, tr=[9]):
+        best_bbox = {}
+        best_conf = 0
+        for bbox in bboxes:
+            if int(bbox['cls']) in tr:
+                if float(bbox['conf']) >best_conf:
+                    best_bbox = bbox
+        if len(best_bbox) >0:
+            best_rect = QRect(best_bbox['bbox'][0], best_bbox['bbox'][1], best_bbox['size'][0], best_bbox['size'][1])
+            tr_img = self.crop_image(image, best_rect)
+            tr_type = int(best_bbox['cls'])
+            return tr_type, tr_img
+        else:
+            return None
 
+    def crop_image(self, image, crop_rect):
+        cropped_pixmap = QPixmap(crop_rect.size())
+        cropped_pixmap.fill(Qt.white)
+        painter = QPainter(cropped_pixmap)
+        painter.drawPixmap(QRect(0, 0, crop_rect.width(), crop_rect.height()), image, crop_rect)
+        painter.end()
+        return cropped_pixmap
+    
     def get_bbox_pen(self, _object):
         pen = QPen()
         pen.setWidth(3)

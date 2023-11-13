@@ -16,9 +16,12 @@ class MainWindow(QMainWindow, form_class):
         self.set_connect()
 
     def set_connect(self):
+        self.tr_list = [self.t1, self.t2, self.t3, self.t4]
         self.open.clicked.connect(self.set)
         self.check.clicked.connect(self.getData.get)
         self.getData.send_img.connect(self.disp_img)
+        self.getData.send_tr_img.connect(self.disp_tr_img)
+        self.getData.send_tr_type.connect(self.disp_tr_type)
         self.getData.send_nums.connect(self.disp_num)
         self.getData.send_txts.connect(self.disp_txt)
 
@@ -31,6 +34,23 @@ class MainWindow(QMainWindow, form_class):
         self.img.setPixmap(
             QPixmap.fromImage(_object).scaled(self.img.width(), self.img.height(), aspectRatioMode=1))
     
+    def disp_tr_img(self, _object):
+        self.tr_img.setPixmap(
+            QPixmap.fromImage(_object).scaled(self.img.width(), self.img.height(), aspectRatioMode=1))
+    
+    def disp_tr_type(self, t):
+        #TODO fix tr class (10) -> for test
+        tl_cls_list = [[6, 12, 10,13, 15], [8, 11, 13, 16], [12, 14], [4, 9, 14, 17]] #R, Y, Arr, G
+        tl_detect_cls = [i for i, cls in enumerate(tl_cls_list) if t in cls]
+        
+        for tc in tl_detect_cls:
+            if tc == 0:
+                self.tr_list[tc].setStyleSheet('background-color: rgb(255, 66, 98)')
+            if tc == 1:
+                self.tr_list[tc].setStyleSheet('background-color: rgb(255, 208, 66)')
+            if tc == 2 or tc == 3:
+                self.tr_list[tc].setStyleSheet('background-color: rgb(59, 217, 153)')
+        
     def disp_num(self, p, v):
         self.p_cnt.setText(str(p))
         self.v_cnt.setText(str(v))
