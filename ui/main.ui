@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1058</width>
-    <height>460</height>
+    <height>589</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -259,10 +259,46 @@ border-radius:25px;
      </rect>
     </property>
     <property name="text">
-     <string>Detected Traffic Ligh</string>
+     <string>Detected Traffic Light</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="right">
+    <property name="geometry">
+     <rect>
+      <x>820</x>
+      <y>529</y>
+      <width>231</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>↓</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="left">
+    <property name="geometry">
+     <rect>
+      <x>820</x>
+      <y>460</y>
+      <width>231</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>↑</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="list">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>460</y>
+      <width>811</width>
+      <height>121</height>
+     </rect>
     </property>
    </widget>
   </widget>

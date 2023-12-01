@@ -18,6 +18,7 @@ class MainWindow(QMainWindow, form_class):
     def set_connect(self):
         self.tr_list = [self.t1, self.t2, self.t3, self.t4]
         self.open.clicked.connect(self.set)
+        self.getData.send_list.connect(self.disp_list)
         self.check.clicked.connect(self.getData.get)
         self.getData.send_img.connect(self.disp_img)
         self.getData.send_tr_img.connect(self.disp_tr_img)
@@ -29,6 +30,12 @@ class MainWindow(QMainWindow, form_class):
         path = str(QFileDialog.getExistingDirectory(None, 'Select Directory of top of datasets', QDir.currentPath(),
                                                     QFileDialog.ShowDirsOnly))
         self.getData.set_path(path)
+
+    def disp_list(self, _object):
+        for i in _object:
+            item = QListWidgetItem(i)
+            self.list.addItem(item)
+        self.data_len = self.getData.data_len
 
     def disp_img(self, _object):
         self.img.setPixmap(
@@ -58,6 +65,12 @@ class MainWindow(QMainWindow, form_class):
         st = t.split(' ')
         s = ' '.join(st[0:3])+"\n"+' '.join(st[3:6])+"\n"+' '.join(st[6:])
         self.caption.setText(s)
+    
+    def go_up(self):
+        self.getData.move(-1)
+
+    def go_down(self):
+        self.getData.move(1)
 
 def main():
     app = QApplication(sys.argv)

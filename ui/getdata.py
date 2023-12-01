@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from operator import itemgetter
 from collections import Counter
 
@@ -10,12 +11,23 @@ class GetData(QObject):
     def __init__(self):
         super(GetData, self).__init__()
         self.base = ""
+        self.data_paths = []
+        self.data_len = 0
+        self.data_name = ''
+        self.now_idx = 0
+
+    send_list = pyqtSignal(object)
 
     def set_path(self, path):
         self.base = str(path)
+        self.data_paths.extend(os.path.basename(x)
+                                   for x in sorted(Path(path).glob("*.jpg")))
+        self.data_len = len(self.data_paths)
         with open(f"{self.base}/classes.txt") as f:
             self.class_list = [line.strip() for line in f.readlines()]
-
+        self.send_list.emit(self.data_paths)
+        self.now_data_name = self.data_paths[0].split(".")[0]
+        
     send_img = pyqtSignal(object)
     send_tr_img = pyqtSignal(object)
     send_tr_type = pyqtSignal(int)
@@ -23,13 +35,13 @@ class GetData(QObject):
     send_txts = pyqtSignal(str)
 
     def get(self):
-        data_path = f"{self.base}/img.jpg"
+        data_path = f"{self.base}/{self.now_data_name}.jpg"
         qimg = QImage(data_path)
         self.width = qimg.width()
         self.height = qimg.height()
 
-        inf_path = f"{self.base}/inf_cls.txt"
-        cap_path = f"{self.base}/inf_cap.txt"
+        inf_path = f"{self.base}/{self.now_data_name}_cls.txt"
+        cap_path = f"{self.base}/{self.now_data_name}_cap.txt"
 
         bboxes = self.get_label_list(inf_path)
         tr = self.get_tr_img(qimg, bboxes)
@@ -146,3 +158,13 @@ class GetData(QObject):
             qb = QBrush(QColor('#f37021'))
             pen.setBrush(qb)
         return pen
+
+    def move(self, idx):
+        self.now_idx += idx
+        if self.now_idx < 0:
+            self.now_idx = 0
+        elif self.now_idx > self.data_len - 1:
+            self.now_idx = self.data_len - 1
+
+        self.now_data_name = self.data_paths[self.now_idx].split(".")[0]
+        self.get()
