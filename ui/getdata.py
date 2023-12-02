@@ -6,8 +6,6 @@ from collections import Counter
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-import clip_inf as ci
-import detect_inf as di
 
 class GetData(QObject):
     def __init__(self):
@@ -18,7 +16,17 @@ class GetData(QObject):
         self.data_name = ''
         self.now_idx = 0
 
+        self.ci = None
+        self.di = None
+
     send_list = pyqtSignal(object)
+
+    def load_classes(self):
+        import clip_inf as ci
+        import detect_inf as di
+
+        self.ci = ci
+        self.di = di
 
     def set_path(self, path):
         self.base = str(path)
@@ -35,17 +43,20 @@ class GetData(QObject):
     send_tr_type = pyqtSignal(int)
     send_nums = pyqtSignal(int, int)
     send_txts = pyqtSignal(str)
+    send_inf = pyqtSignal(str, int)
 
     def get(self):
         data_path = f"{self.base}/{self.now_data_name}.jpg"
         qimg = QImage(data_path)
+        self.send_img.emit(qimg)
+        QCoreApplication.processEvents()
         
         self.width = qimg.width()
         self.height = qimg.height()
 
         #inf_path = f"{self.base}/{self.now_data_name}_cls.txt"
         # cap_path = f"{self.base}/{self.now_data_name}_cap.txt"
-        inf_list = di.get_result(data_path)
+        inf_list = self.di.get_result(data_path)
 
         bboxes = self.get_label_list(inf_list)
         tr = self.get_tr_img(qimg, bboxes)
@@ -61,7 +72,8 @@ class GetData(QObject):
 
         # with open(cap_path, 'r') as f:
         #     cap = f.readline()
-        cap = ci.get_result(data_path)
+        cap = self.ci.get_result(data_path)
+        print(QObjectCleanupHandler)
         self.send_txts.emit(cap)
         
 
@@ -168,6 +180,14 @@ class GetData(QObject):
             self.now_idx = 0
         elif self.now_idx > self.data_len - 1:
             self.now_idx = self.data_len - 1
-
         self.now_data_name = self.data_paths[self.now_idx].split(".")[0]
+        self.send_inf.emit(self.now_data_name, self.now_idx)
+        QCoreApplication.processEvents()
+        self.get()
+    
+    def change(self, idx):
+        self.now_idx = idx
+        self.now_data_name = self.data_paths[self.now_idx].split(".")[0]
+        self.send_inf.emit(self.now_data_name, self.now_idx)
+        QCoreApplication.processEvents()
         self.get()

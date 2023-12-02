@@ -6,10 +6,11 @@ import numpy as np
 from pathlib import Path
 import os
 
-os.environ.update({"QT_QPA_PLATFORM_PLUGIN_PATH":"/home/kana/yes/envs/clip/lib/python3.8/site-packages/PyQt5/Qt5/plugins/xcbglintegrations/libqxcb-glx-integration.so"})
+#os.environ.update({"QT_QPA_PLATFORM_PLUGIN_PATH":"/home/kana/yes/envs/clip/lib/python3.8/site-packages/PyQt5/Qt5/plugins/xcbglintegrations/libqxcb-glx-integration.so"})
 
 m_base = '/home/kana/Training/yolov7/runs/train/yolov7-aihub1-before/weights'
-weight = f'{m_base}/best.pt'
+#weight = f'{m_base}/best.pt'
+weight = f'/home/kana/Documents/Models/yolo7.pt'
 conf_thres=0.25
 iou_thres=0.45
 img_path ='/home/kana/Documents/Dataset/TS/test_data/NI_00C_NO_211004_04_016892.jpg'
