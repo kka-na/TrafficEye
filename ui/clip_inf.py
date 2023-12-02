@@ -28,6 +28,10 @@ def get_result(file):
   caption = list(caption.split(' '))
   caption_unique = list(set(caption))
 
+  t = 'time'
+  w = 'weather'
+  r = 'road'
+
   for cap in caption_unique:
     if cap in times:
       t = cap
@@ -43,5 +47,5 @@ def get_result(file):
   return c
 
 #test
-c = get_result(img_path)
-print(c)
+# c = get_result(img_path)
+# print(c)

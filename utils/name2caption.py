@@ -31,3 +31,4 @@ with tarfile.open(f'{base}/ts_tar.tar', 'w') as tarf:
       img = Image.open(f"{folder_path}/{file_name}")
       img = img.resize((256, 256))
       img.save(f"{base}/data256/{fname}.jpg")
+      

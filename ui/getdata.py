@@ -6,6 +6,8 @@ from collections import Counter
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
+import clip_inf as ci
+import detect_inf as di
 
 class GetData(QObject):
     def __init__(self):
@@ -37,13 +39,15 @@ class GetData(QObject):
     def get(self):
         data_path = f"{self.base}/{self.now_data_name}.jpg"
         qimg = QImage(data_path)
+        
         self.width = qimg.width()
         self.height = qimg.height()
 
-        inf_path = f"{self.base}/{self.now_data_name}_cls.txt"
-        cap_path = f"{self.base}/{self.now_data_name}_cap.txt"
+        #inf_path = f"{self.base}/{self.now_data_name}_cls.txt"
+        # cap_path = f"{self.base}/{self.now_data_name}_cap.txt"
+        inf_list = di.get_result(data_path)
 
-        bboxes = self.get_label_list(inf_path)
+        bboxes = self.get_label_list(inf_list)
         tr = self.get_tr_img(qimg, bboxes)
         if tr != None:
             self.send_tr_type.emit(tr[0])
@@ -54,31 +58,30 @@ class GetData(QObject):
 
         p, v = self.get_target_num_of_cls(bboxes)
         self.send_nums.emit(p, v)
-        with open(cap_path, 'r') as f:
-            cap = f.readline()
+
+        # with open(cap_path, 'r') as f:
+        #     cap = f.readline()
+        cap = ci.get_result(data_path)
         self.send_txts.emit(cap)
         
 
-    def get_label_list(self, file):
+    def get_label_list(self, inf_list):
         bboxes = []
-        if os.path.isfile(file):
-            fr = open(file)
-            lines = fr.readlines()
-            for line in lines:
-                val = line.split()
-                if len(val) == 5:
-                    conf = 1.0
-                    calc_box = self.calc_boxes(val[1:])
-                    _center = [float(val[1]) * self.width,
-                               float(val[2]) * self.height]
-                else:
-                    conf = float(val[1])
-                    calc_box = self.calc_boxes(val[2:])
-                    _center = [float(val[2]) * self.width,
-                               float(val[3]) * self.height]
-                bbox = {'cls': val[0], 'conf': conf, 'size': calc_box[0:2],
-                        'bbox': calc_box[2:], 'center': _center}
-                bboxes.append(bbox)
+        for line in inf_list:
+            val = line.split(' ')
+            if len(val) == 5:
+                conf = 1.0
+                calc_box = self.calc_boxes(val[1:])
+                _center = [float(val[1]) * self.width,
+                            float(val[2]) * self.height]
+            else:
+                conf = float(val[1])
+                calc_box = self.calc_boxes(val[2:])
+                _center = [float(val[2]) * self.width,
+                            float(val[3]) * self.height]
+            bbox = {'cls': val[0], 'conf': conf, 'size': calc_box[0:2],
+                    'bbox': calc_box[2:], 'center': _center}
+            bboxes.append(bbox)
 
         bboxes = sorted(bboxes, key=itemgetter('conf'), reverse=True)
         return bboxes

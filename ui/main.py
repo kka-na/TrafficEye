@@ -20,6 +20,8 @@ class MainWindow(QMainWindow, form_class):
         self.open.clicked.connect(self.set)
         self.getData.send_list.connect(self.disp_list)
         self.check.clicked.connect(self.getData.get)
+        self.up.clicked.connect(self.go_up)
+        self.down.clicked.connect(self.go_down)
         self.getData.send_img.connect(self.disp_img)
         self.getData.send_tr_img.connect(self.disp_tr_img)
         self.getData.send_tr_type.connect(self.disp_tr_type)
