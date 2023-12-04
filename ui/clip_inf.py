@@ -36,7 +36,7 @@ def get_result(file):
   caption = list(caption.split(' '))
   caption_unique = list(set(caption))
 
-  t = 'unknown uime'
+  t = 'unknown time'
   w = 'unknown weather'
   r = 'unknown'
 

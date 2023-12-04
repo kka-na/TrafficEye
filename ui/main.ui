@@ -162,6 +162,7 @@ border-radius:40px;
     <property name="font">
      <font>
       <family>FreeSans</family>
+      <pointsize>30</pointsize>
      </font>
     </property>
     <property name="styleSheet">

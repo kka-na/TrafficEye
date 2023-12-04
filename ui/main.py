@@ -71,6 +71,7 @@ class MainWindow(QMainWindow, form_class):
     def list_changes(self):
 
         self.init_txts()
+        self.init_trafficlight()
         QCoreApplication.processEvents()
         check_start = time.time()
         self.getData.change(self.list.currentRow())
@@ -85,20 +86,54 @@ class MainWindow(QMainWindow, form_class):
         QCoreApplication.processEvents()
     
     def disp_tr_img(self, _object):
-        self.tr_img.setPixmap(_object.scaled(self.img.width(), self.img.height(), aspectRatioMode=1))
+        self.tr_img.setPixmap(_object.scaled(self.tr_img.width(), self.tr_img.height(), aspectRatioMode=1))
+    
+    def init_trafficlight(self):
+        for t in self.tr_list:
+            t.setStyleSheet('border:1px solid black; border-radius:40px; background-color: rgb(243,243, 243); color:rgb(243, 243, 243);')
+        px = QPixmap(self.tr_img.width(), self.tr_img.height())
+        px.fill(Qt.transparent)
+        self.tr_img.setPixmap(px)
     
     def disp_tr_type(self, t):
-        #TODO fix tr class (9) -> for test
-        tl_cls_list = [[9, 6, 12, 10,13, 15], [8, 11, 13, 16], [12, 14], [4, 14, 17]] #R, Y, Arr, G
-        tl_detect_cls = [i for i, cls in enumerate(tl_cls_list) if t in cls]
+        #tc = R, Y, Arr, G
+
+        def turn_red():
+            self.tr_list[0].setStyleSheet('border:1px solid black;border-radius:40px;background-color: rgb(255, 66, 98);')
         
-        for tc in tl_detect_cls:
-            if tc == 0:
-                self.tr_list[tc].setStyleSheet('border:1px solid black;border-radius:25px;background-color: rgb(255, 66, 98);')
-            if tc == 1:
-                self.tr_list[tc].setStyleSheet('border:1px solid black;border-radius:25px;background-color: rgb(255, 208, 66);')
-            if tc == 2 or tc == 3:
-                self.tr_list[tc].setStyleSheet('border:1px solid black;border-radius:25px;background-color: rgb(59, 217, 153);')
+        def turn_yellow():
+            self.tr_list[1].setStyleSheet('border:1px solid black;border-radius:40px;background-color: rgb(255, 208, 66);')
+        
+        def turn_green_arr(tc):
+            self.tr_list[tc].setStyleSheet('border:1px solid black;border-radius:40px;background-color: rgb(35, 232, 120); color:rgb(243, 243, 243);')
+
+        green = [4,9]
+        red = [6,10]
+        yellow = [8,11]
+        red_arrow = 12
+        red_yellow = 13
+        green_arrow = 14
+        black = 18
+
+        if t in green:
+            turn_green_arr(3)
+        elif t in red:
+            turn_red()
+        elif t in yellow:
+            turn_yellow()
+        elif t == red_arrow:
+            turn_red()
+            turn_green_arr(2)
+        elif t==red_yellow:
+            turn_red()
+            turn_yellow()
+        elif t==green_arrow:
+            turn_green_arr(2)
+            turn_green_arr(3)
+        elif t==black:
+            self.init_trafficlight()
+
+
         
     def disp_num(self, p, v):
         self.p_cnt.setText(str(p))
@@ -116,6 +151,7 @@ class MainWindow(QMainWindow, form_class):
     
     def go_up(self):
         self.init_txts()
+        self.init_trafficlight()
         QCoreApplication.processEvents()
         check_start = time.time()
         self.getData.move(-1)
@@ -125,6 +161,7 @@ class MainWindow(QMainWindow, form_class):
 
     def go_down(self):
         self.init_txts()
+        self.init_trafficlight()
         QCoreApplication.processEvents()
         check_start = time.time()
         self.getData.move(1)

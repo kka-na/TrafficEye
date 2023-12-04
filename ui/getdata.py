@@ -113,7 +113,7 @@ class GetData(QObject):
     def draw_boxes(self, img, bboxes):
         if len(bboxes) > 0:
             painter = QPainter(img)
-            f = QFont("Helvetica [Cronyx]", img.height() / 30)
+            f = QFont("Helvetica [Cronyx]", 100)
             for i, bbox in enumerate(bboxes):
                 pen = self.get_bbox_pen(int(bbox['cls']))
                 painter.setPen(pen)
@@ -126,7 +126,7 @@ class GetData(QObject):
             painter.end()
         return img
     
-    def get_tr_img(self, image, bboxes, tr=[9]):
+    def get_tr_img(self, image, bboxes, tr=[4,6,8,9,10,11,12,13,14,18]):
         best_bbox = {}
         best_conf = 0
         for i, bbox in enumerate(bboxes):

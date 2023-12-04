@@ -1,0 +1,13 @@
+person
+bicycle
+car
+motorcycle
+green3_h
+bus
+red3_h
+truck
+yellow3_h
+redgreen4_h
+redyellow4_h
+greenarrow4_h
+black
